@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS Learning System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .bg-theme-main {
+            background-color: #26A69A;
+        }
+
+        .text-theme-main {
+            color: #26A69A;
+        }
+
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+
+        body.modal-active {
+            overflow: hidden;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .drop-zone.dragover {
+            background-color: #e0f2f1;
+            border-color: #26A69A;
+        }
+
+        .option-img {
+            max-height: 120px;
+            width: 100%;
+            object-fit: contain;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+            padding: 4px;
+        }
+
+        /* Card Redesign */
+        .card-pattern {
+            position: relative;
+            overflow: hidden;
+            background-color: white;
+        }
+
+        .card-pattern::before {
+            content: "";
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .card-pattern::after {
+            content: "";
+            position: absolute;
+            bottom: -5%;
+            left: -5%;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .gradient-pre {
+            background: linear-gradient(135deg, #0f766e 0%, #2dd4bf 100%);
+            color: white;
+        }
+
+        .gradient-post {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+        }
+
+        .lesson-card-pattern {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.2) 0.5px, transparent 0.5px);
+            background-size: 10px 10px;
+        }
+
+        .gradient-1 {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .gradient-2 {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+        }
+
+        .gradient-3 {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            color: white;
+        }
+
+        .gradient-4 {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            color: white;
+        }
+
+        .gradient-5 {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+        }
+
+        .gradient-6 {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            color: white;
+        }
+
+        .nav-gradient {
+            background: linear-gradient(135deg, #673AB7 0%, #E91E63 100%);
+        }
+
+        .nav-pattern {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-pattern::before {
+            content: "";
+            position: absolute;
+            top: -20%;
+            left: -5%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay"
+        class="fixed inset-0 bg-white bg-opacity-90 z-50 flex flex-col items-center justify-center hidden">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mb-4"></div>
+        <p class="text-gray-600 animate-pulse">กำลังดำเนินการ...</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-gradient nav-pattern shadow-lg text-white sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center cursor-pointer" onclick="app.showView('home-view')">
+                    <div
+                        class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mr-3 border border-white/20">
+                        <i class="fa-solid fa-graduation-cap text-2xl text-white"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-xl tracking-tight leading-tight">LMS Learning</span>
+                        <span class="text-xs text-white/70 font-light">โรงเรียนบ้านเสยเสย</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="openModal('login-modal')"
+                        class="hidden md:block bg-white/10 text-white border border-white/30 px-4 py-1.5 rounded-full font-medium hover:bg-white/20 transition-all backdrop-blur-sm">
+                        <i class="fa-solid fa-user-shield mr-1"></i> ผู้ดูแลระบบ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 relative z-10">
+
+        <!-- VIEW: Home -->
+        <div id="home-view" class="view-section">
+            <div class="text-center mb-10">
+                <h1 class="text-4xl font-bold text-gray-800 mb-2 drop-shadow-sm">ยินดีต้อนรับสู่บทเรียนออนไลน์</h1>
+                <p class="text-gray-600">แหล่งเรียนรู้และทดสอบความรู้ออนไลน์</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <!-- Pre-test Card -->
+                <!-- Pre-test Card -->
+                <div class="md:col-span-3 gradient-pre card-pattern rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all cursor-pointer p-6 text-center"
+                    onclick="app.openStudentLogin('pre')">
+                    <div class="relative z-10 text-white">
+                        <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-file-pen text-3xl"></i>
+                        </div>
+                        <h2 class="text-xl font-bold">แบบทดสอบก่อนเรียน</h2>
+                        <p class="text-sm text-white/80 mt-2 font-light">Pre-test Assessment</p>
+                    </div>
+                </div>
+
+                <!-- Lessons List (Center) -->
+                <div class="md:col-span-6 space-y-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-xl font-bold text-gray-800"><i
+                                class="fa-solid fa-book-open mr-2 text-theme-main"></i>บทเรียนทั้งหมด</h2>
+                        <span id="lesson-count-badge" class="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full">0
+                            บทเรียน</span>
+                    </div>
+                    <div id="lesson-list" class="space-y-4">
+                        <!-- Lessons injected here -->
+                    </div>
+                </div>
+
+                <!-- Post-test Card -->
+                <!-- Post-test Card -->
+                <div class="md:col-span-3 gradient-post card-pattern rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all cursor-pointer p-6 text-center"
+                    onclick="app.openStudentLogin('post')">
+                    <div class="relative z-10 text-white">
+                        <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-graduation-cap text-3xl"></i>
+                        </div>
+                        <h2 class="text-xl font-bold">แบบทดสอบหลังเรียน</h2>
+                        <p class="text-sm text-white/80 mt-2 font-light">Post-test Assessment</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: Lesson Detail -->
+        <div id="lesson-view" class="view-section hidden">
+            <!-- Modal-like view for lesson details usually better, but sticking to page view per previous design -->
+            <!-- Wait, previous code used a modal 'detail-modal' in app logic but 'view-section' in HTML. I will use a modal for details. -->
+        </div>
+
+        <!-- VIEW: Admin Dashboard -->
+        <div id="admin-view" class="view-section hidden">
+            <div class="bg-white rounded-xl shadow-2xl overflow-hidden min-h-[80vh]">
+                <!-- Header -->
+                <div class="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
+                    <h2 class="text-xl font-bold"><i
+                            class="fa-solid fa-gauge-high mr-2 text-theme-main"></i>แผงควบคุมระบบ</h2>
+                    <button onclick="app.logout()" class="text-gray-300 hover:text-white transition-colors text-sm">
+                        <i class="fa-solid fa-right-from-bracket mr-1"></i> ออกจากระบบ
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex overflow-x-auto bg-gray-100 border-b custom-scrollbar">
+                    <button onclick="app.switchAdminTab('profile')"
+                        class="admin-tab-btn flex-shrink-0 px-6 py-3 font-semibold text-gray-600 hover:text-theme-main border-b-2 border-transparent transition-colors"
+                        data-tab="profile"><i class="fa-solid fa-user-gear mr-1"></i> ข้อมูลส่วนตัว</button>
+                    <button onclick="app.switchAdminTab('students')"
+                        class="admin-tab-btn flex-shrink-0 px-6 py-3 font-semibold text-gray-600 hover:text-theme-main border-b-2 border-transparent transition-colors"
+                        data-tab="students"><i class="fa-solid fa-users mr-1"></i> นักเรียน</button>
+                    <button onclick="app.switchAdminTab('lessons')"
+                        class="admin-tab-btn flex-shrink-0 px-6 py-3 font-semibold text-gray-600 hover:text-theme-main border-b-2 border-transparent transition-colors"
+                        data-tab="lessons"><i class="fa-solid fa-book mr-1"></i> บทเรียน</button>
+                    <button onclick="app.switchAdminTab('exams_pre')"
+                        class="admin-tab-btn flex-shrink-0 px-6 py-3 font-semibold text-gray-600 hover:text-theme-main border-b-2 border-transparent transition-colors"
+                        data-tab="exams_pre"><i class="fa-solid fa-file-pen mr-1"></i> ข้อสอบก่อนเรียน</button>
+                    <button onclick="app.switchAdminTab('exams_post')"
+                        class="admin-tab-btn flex-shrink-0 px-6 py-3 font-semibold text-gray-600 hover:text-theme-main border-b-2 border-transparent transition-colors"
+                        data-tab="exams_post"><i class="fa-solid fa-graduation-cap mr-1"></i> ข้อสอบหลังเรียน</button>
+                    <button onclick="app.switchAdminTab('scores')"
+                        class="admin-tab-btn flex-shrink-0 px-6 py-3 font-semibold text-gray-600 hover:text-theme-main border-b-2 border-transparent transition-colors"
+                        data-tab="scores"><i class="fa-solid fa-trophy mr-1"></i> ผลคะแนน</button>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6">
+                    <div id="tab-profile" class="admin-tab-content hidden max-w-md mx-auto">
+                        <h3 class="text-lg font-bold mb-4 border-l-4 border-gray-600 pl-3">แก้ไขข้อมูลส่วนตัว</h3>
+                        <div class="bg-gray-50 p-6 rounded shadow border">
+                            <label class="block text-sm font-bold mb-1">Username</label>
+                            <input type="hidden" id="admin-current-username">
+                            <input type="text" id="admin-edit-username"
+                                class="w-full p-2 border rounded mb-4 focus:outline-none focus:border-teal-500">
+                            <label class="block text-sm font-bold mb-1">New Password</label>
+                            <input type="password" id="admin-edit-password"
+                                class="w-full p-2 border rounded mb-6 focus:outline-none focus:border-teal-500">
+                            <button onclick="app.updateAdminProfile()"
+                                class="w-full bg-gray-800 text-white py-2 rounded hover:bg-gray-900 font-bold transition-colors">บันทึกข้อมูล</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Students -->
+                    <div id="tab-students" class="admin-tab-content hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold border-l-4 border-blue-500 pl-3">รายชื่อนักเรียน</h3>
+                            <button onclick="openModal('student-modal')"
+                                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"><i
+                                    class="fa-solid fa-plus mr-1"></i> เพิ่มนักเรียน</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-blue-50">
+                                    <tr>
+                                        <th class="p-3">Username</th>
+                                        <th class="p-3">ชื่อ-นามสกุล</th>
+                                        <th class="p-3">Password</th>
+                                        <th class="p-3 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="student-table-body" class="divide-y"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Lessons -->
+                    <div id="tab-lessons" class="admin-tab-content">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold border-l-4 border-theme-main pl-3">รายการบทเรียน</h3>
+                            <button onclick="dataManager.prepareAdd()"
+                                class="bg-theme-main text-white px-3 py-1 rounded hover:bg-teal-700"><i
+                                    class="fa-solid fa-plus mr-1"></i> เพิ่มบทเรียน</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-teal-50">
+                                    <tr>
+                                        <th class="p-3">วันที่</th>
+                                        <th class="p-3">หัวข้อ</th>
+                                        <th class="p-3 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-lesson-table-body" class="divide-y"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Exams Pre -->
+                    <div id="tab-exams_pre" class="admin-tab-content hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold border-l-4 border-yellow-500 pl-3">ข้อสอบก่อนเรียน</h3>
+                            <button onclick="dataManager.prepareAddExam('pre')"
+                                class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"><i
+                                    class="fa-solid fa-plus mr-1"></i> เพิ่มข้อสอบ</button>
+                        </div>
+                        <div id="exam-pre-list"></div>
+                    </div>
+
+                    <!-- Tab: Exams Post -->
+                    <div id="tab-exams_post" class="admin-tab-content hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold border-l-4 border-red-500 pl-3">ข้อสอบหลังเรียน</h3>
+                            <button onclick="dataManager.prepareAddExam('post')"
+                                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"><i
+                                    class="fa-solid fa-plus mr-1"></i> เพิ่มข้อสอบ</button>
+                        </div>
+                        <div id="exam-post-list"></div>
+                    </div>
+
+                    <!-- Tab: Scores -->
+                    <div id="tab-scores" class="admin-tab-content hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold border-l-4 border-green-500 pl-3">ผลคะแนนสอบ</h3>
+                            <select id="score-filter" onchange="app.filterScores()"
+                                class="border p-2 rounded focus:outline-none focus:border-green-500">
+                                <option value="pre">คะแนนสอบก่อนเรียน</option>
+                                <option value="post">คะแนนสอบหลังเรียน</option>
+                            </select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-green-50">
+                                    <tr>
+                                        <th class="p-3 text-center">ลำดับ</th>
+                                        <th class="p-3">ชื่อ-นามสกุล</th>
+                                        <th class="p-3 text-center">คะแนน</th>
+                                        <th class="p-3 text-center">เวลา</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="score-table-body" class="divide-y"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: Exam Taking -->
+        <div id="exam-view" class="view-section hidden">
+            <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden min-h-[50vh]">
+                <div class="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
+                    <h2 class="text-xl font-bold" id="exam-view-title">แบบทดสอบ</h2>
+                    <div class="text-sm opacity-80" id="exam-student-name"></div>
+                </div>
+                <div id="exam-questions-container" class="p-8 space-y-8 bg-gray-50"></div>
+                <div class="p-6 bg-white border-t flex justify-end">
+                    <button onclick="app.submitExam()"
+                        class="bg-theme-main text-white text-lg font-bold px-8 py-2 rounded-full hover:bg-teal-700 shadow transform hover:-translate-y-1 transition-all">
+                        ส่งคำตอบ <i class="fa-solid fa-paper-plane ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Floating Login Button -->
+    <button onclick="openModal('login-modal')"
+        class="fixed bottom-6 right-6 md:hidden bg-theme-main text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-50">
+        <i class="fa-solid fa-user-shield text-xl"></i>
+    </button>
+
+    <!-- Modals -->
+
+    <!-- Admin Login -->
+    <div id="login-modal"
+        class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div
+            class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden transform transition-all scale-100 opacity-100">
+            <div class="bg-gray-800 p-4 text-white flex justify-between items-center">
+                <h3 class="text-lg font-bold"><i
+                        class="fa-solid fa-user-shield mr-2 text-theme-main"></i>เข้าสู่ระบบผู้ดูแล</h3>
+                <button onclick="closeModal('login-modal')"
+                    class="text-white opacity-70 hover:opacity-100 text-xl">&times;</button>
+            </div>
+            <div class="p-6">
+                <form onsubmit="app.handleLogin(event)">
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Username</label>
+                        <input type="text" id="username" placeholder="ชื่อผู้ใช้งาน"
+                            class="w-full border p-2 rounded focus:border-teal-500 outline-none" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Password</label>
+                        <input type="password" id="password" placeholder="รหัสผ่าน"
+                            class="w-full border p-2 rounded focus:border-teal-500 outline-none" required>
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-gray-800 text-white py-2 rounded-lg hover:bg-black font-bold shadow-lg transition-all active:scale-95">ยืนยันการเข้าสู่ระบบ</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Login -->
+    <div id="student-login-modal"
+        class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden transform transition-all">
+            <div id="student-modal-header" class="bg-blue-600 p-4 text-white flex justify-between items-center">
+                <h3 class="text-lg font-bold" id="student-modal-title">เข้าสู่ระบบนักเรียน</h3>
+                <button onclick="closeModal('student-login-modal')"
+                    class="text-white opacity-70 hover:opacity-100 text-xl">&times;</button>
+            </div>
+            <div class="p-6">
+                <form onsubmit="app.handleStudentLogin(event)">
+                    <input type="hidden" id="exam-type-target">
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Username</label>
+                        <input type="text" id="student-username" placeholder="Username"
+                            class="w-full border p-2 rounded focus:border-blue-500 outline-none" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Password</label>
+                        <input type="password" id="student-password" placeholder="Password"
+                            class="w-full border p-2 rounded focus:border-blue-500 outline-none" required>
+                    </div>
+                    <button id="student-login-btn" type="submit"
+                        class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-bold shadow-lg transition-all active:scale-95">เข้าทำแบบทดสอบ</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Detail Modal -->
+    <div id="detail-modal"
+        class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div
+            class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar transform transition-all overflow-hidden">
+            <div
+                class="sticky top-0 nav-gradient nav-pattern text-white px-6 py-4 flex justify-between items-center z-10 shadow-md">
+                <div class="flex items-center truncate">
+                    <i class="fa-solid fa-book-open mr-3 text-white/80"></i>
+                    <h3 class="text-lg font-bold truncate pr-4" id="detail-topic"></h3>
+                </div>
+                <button onclick="closeModal('detail-modal')"
+                    class="text-white opacity-70 hover:opacity-100 text-2xl transition-all">&times;</button>
+            </div>
+            <div class="p-8">
+                <div id="detail-date" class="mb-4 text-sm text-gray-500 inline-block bg-gray-100 px-2 py-1 rounded">
+                </div>
+                <div id="detail-content" class="prose max-w-none text-gray-700 mb-8"></div>
+
+                <div id="detail-links-section" class="hidden mb-6">
+                    <h4 class="font-bold text-gray-800 mb-2 border-b pb-1">ลิงค์ที่เกี่ยวข้อง</h4>
+                    <ul id="detail-links-list" class="space-y-2"></ul>
+                </div>
+
+                <div id="detail-gallery-section" class="hidden mb-6">
+                    <h4 class="font-bold text-gray-800 mb-2 border-b pb-1">แกลเลอรีรูปภาพ</h4>
+                    <div id="detail-gallery-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
+                </div>
+
+                <div id="detail-files-section" class="hidden">
+                    <h4 class="font-bold text-gray-800 mb-2 border-b pb-1">เอกสารแนบ</h4>
+                    <ul id="detail-files-list" class="space-y-2"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Manage Modal -->
+    <div id="lesson-modal"
+        class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div
+            class="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[95vh] overflow-y-auto custom-scrollbar overflow-hidden">
+            <div class="bg-gray-800 p-4 text-white flex justify-between items-center sticky top-0 z-10">
+                <h3 class="text-lg font-bold"><i
+                        class="fa-solid fa-graduation-cap mr-2 text-theme-main"></i>จัดการบทเรียน</h3>
+                <button onclick="closeModal('lesson-modal')"
+                    class="text-white opacity-70 hover:opacity-100 text-xl transition-all">&times;</button>
+            </div>
+            <div class="p-6">
+                <form id="lesson-form" onsubmit="dataManager.saveLesson(event)" class="space-y-4">
+                    <input type="hidden" id="lesson-id">
+                    <input type="text" id="lesson-topic" placeholder="หัวข้อบทเรียน"
+                        class="w-full border p-2 rounded focus:border-teal-500 outline-none" required>
+                    <textarea id="lesson-content-editor" name="lesson-content-editor"></textarea>
+
+                    <div class="border p-4 rounded bg-gray-50">
+                        <div class="flex justify-between mb-2">
+                            <label class="font-bold text-sm">ลิงค์</label>
+                            <button type="button" onclick="dataManager.addLinkToForm()"
+                                class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">+ เพิ่ม</button>
+                        </div>
+                        <div id="links-container"></div>
+                    </div>
+
+                    <div class="border p-4 rounded bg-gray-50">
+                        <label class="font-bold text-sm block mb-2">ไฟล์และรูปภาพ</label>
+                        <div id="drop-zone"
+                            class="border-2 border-dashed border-gray-300 rounded p-6 text-center cursor-pointer hover:bg-white transition-colors">
+                            <i class="fa-solid fa-cloud-arrow-up text-gray-400 text-3xl mb-1"></i>
+                            <p class="text-xs text-gray-500">คลิกหรือลากไฟล์มาวาง</p>
+                            <input type="file" id="file-input" class="hidden" multiple
+                                onchange="dataManager.handleFileSelect(event)">
+                        </div>
+                        <ul id="file-preview-list" class="mt-2 text-sm space-y-1"></ul>
+                    </div>
+
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" onclick="closeModal('lesson-modal')"
+                            class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">ยกเลิก</button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-theme-main text-white rounded hover:bg-teal-700 font-bold">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Manage Modal -->
+    <div id="student-modal"
+        class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
+            <h3 class="text-lg font-bold mb-4 border-b pb-2">จัดการข้อมูลนักเรียน</h3>
+            <form onsubmit="dataManager.saveStudent(event)" class="space-y-3">
+                <input type="text" id="manage-student-username" placeholder="Username" class="w-full border p-2 rounded"
+                    required>
+                <input type="text" id="manage-student-password" placeholder="Password" class="w-full border p-2 rounded"
+                    required>
+                <input type="text" id="manage-student-fullname" placeholder="ชื่อ-นามสกุล"
+                    class="w-full border p-2 rounded" required>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" onclick="closeModal('student-modal')"
+                        class="px-3 py-1 text-gray-500 hover:bg-gray-100 rounded">ยกเลิก</button>
+                    <button type="submit"
+                        class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Exam Manage Modal -->
+    <div id="exam-modal"
+        class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <h3 class="text-lg font-bold mb-4 border-b pb-2" id="exam-modal-title">จัดการข้อสอบ</h3>
+            <form onsubmit="dataManager.saveExam(event)" class="space-y-3">
+                <input type="hidden" id="exam-id"><input type="hidden" id="exam-type">
+
+                <textarea id="exam-question" placeholder="คำถาม" class="w-full border p-2 rounded h-20"
+                    required></textarea>
+
+                <div class="space-y-3">
+                    <p class="text-sm font-bold text-gray-500">ตัวเลือก (เลือกข้อที่ถูก)</p>
+
+                    <!-- Option 1 -->
+                    <div class="space-y-1 p-2 border rounded bg-white">
+                        <div class="flex gap-2 items-center">
+                            <input type="radio" name="correct-ans" value="1" required>
+                            <input type="text" id="exam-opt-1" placeholder="ตัวเลือก 1"
+                                class="flex-1 border p-1 rounded text-sm" required>
+                            <button type="button" onclick="document.getElementById('exam-opt-file-1').click()"
+                                class="text-xs bg-gray-100 p-1 rounded hover:bg-gray-200">
+                                <i class="fa-solid fa-image"></i>
+                            </button>
+                            <input type="file" id="exam-opt-file-1" accept="image/*" class="hidden"
+                                onchange="dataManager.handleOptionImage(this, 1)">
+                        </div>
+                        <div id="exam-opt-img-preview-1"
+                            class="hidden h-16 bg-contain bg-no-repeat bg-center border bg-gray-50 relative mt-1">
+                            <button type="button" onclick="dataManager.clearOptionImage(1)"
+                                class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-[10px]">&times;</button>
+                        </div>
+                    </div>
+
+                    <!-- Option 2 -->
+                    <div class="space-y-1 p-2 border rounded bg-white">
+                        <div class="flex gap-2 items-center">
+                            <input type="radio" name="correct-ans" value="2" required>
+                            <input type="text" id="exam-opt-2" placeholder="ตัวเลือก 2"
+                                class="flex-1 border p-1 rounded text-sm" required>
+                            <button type="button" onclick="document.getElementById('exam-opt-file-2').click()"
+                                class="text-xs bg-gray-100 p-1 rounded hover:bg-gray-200">
+                                <i class="fa-solid fa-image"></i>
+                            </button>
+                            <input type="file" id="exam-opt-file-2" accept="image/*" class="hidden"
+                                onchange="dataManager.handleOptionImage(this, 2)">
+                        </div>
+                        <div id="exam-opt-img-preview-2"
+                            class="hidden h-16 bg-contain bg-no-repeat bg-center border bg-gray-50 relative mt-1">
+                            <button type="button" onclick="dataManager.clearOptionImage(2)"
+                                class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-[10px]">&times;</button>
+                        </div>
+                    </div>
+
+                    <!-- Option 3 -->
+                    <div class="space-y-1 p-2 border rounded bg-white">
+                        <div class="flex gap-2 items-center">
+                            <input type="radio" name="correct-ans" value="3" required>
+                            <input type="text" id="exam-opt-3" placeholder="ตัวเลือก 3"
+                                class="flex-1 border p-1 rounded text-sm" required>
+                            <button type="button" onclick="document.getElementById('exam-opt-file-3').click()"
+                                class="text-xs bg-gray-100 p-1 rounded hover:bg-gray-200">
+                                <i class="fa-solid fa-image"></i>
+                            </button>
+                            <input type="file" id="exam-opt-file-3" accept="image/*" class="hidden"
+                                onchange="dataManager.handleOptionImage(this, 3)">
+                        </div>
+                        <div id="exam-opt-img-preview-3"
+                            class="hidden h-16 bg-contain bg-no-repeat bg-center border bg-gray-50 relative mt-1">
+                            <button type="button" onclick="dataManager.clearOptionImage(3)"
+                                class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-[10px]">&times;</button>
+                        </div>
+                    </div>
+
+                    <!-- Option 4 -->
+                    <div class="space-y-1 p-2 border rounded bg-white">
+                        <div class="flex gap-2 items-center">
+                            <input type="radio" name="correct-ans" value="4" required>
+                            <input type="text" id="exam-opt-4" placeholder="ตัวเลือก 4"
+                                class="flex-1 border p-1 rounded text-sm" required>
+                            <button type="button" onclick="document.getElementById('exam-opt-file-4').click()"
+                                class="text-xs bg-gray-100 p-1 rounded hover:bg-gray-200">
+                                <i class="fa-solid fa-image"></i>
+                            </button>
+                            <input type="file" id="exam-opt-file-4" accept="image/*" class="hidden"
+                                onchange="dataManager.handleOptionImage(this, 4)">
+                        </div>
+                        <div id="exam-opt-img-preview-4"
+                            class="hidden h-16 bg-contain bg-no-repeat bg-center border bg-gray-50 relative mt-1">
+                            <button type="button" onclick="dataManager.clearOptionImage(4)"
+                                class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-[10px]">&times;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border p-3 rounded bg-gray-50 mt-2">
+                    <label class="text-xs font-bold block mb-1">รูปภาพประกอบ (ถ้ามี)</label>
+                    <input type="file" id="exam-file" accept="image/*" class="text-sm"
+                        onchange="dataManager.handleExamImage(this)">
+                    <div id="exam-img-preview"
+                        class="hidden mt-2 h-24 bg-contain bg-no-repeat bg-center border bg-white relative">
+                        <button type="button" onclick="dataManager.clearExamImage()"
+                            class="absolute top-0 right-0 bg-red-500 text-white w-5 h-5 flex items-center justify-center text-xs">&times;</button>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" onclick="closeModal('exam-modal')"
+                        class="px-3 py-1 text-gray-500 hover:bg-gray-100 rounded">ยกเลิก</button>
+                    <button type="submit"
+                        class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal"
+        class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/90 backdrop-blur-md">
+        <button onclick="app.closeLightbox()"
+            class="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 z-[70]">&times;</button>
+        <button onclick="app.changeLightboxImage(-1)"
+            class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white w-12 h-12 flex items-center justify-center rounded-full text-2xl transition-all z-[70]">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button onclick="app.changeLightboxImage(1)"
+            class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white w-12 h-12 flex items-center justify-center rounded-full text-2xl transition-all z-[70]">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        <div class="max-w-4xl max-h-[85vh] flex flex-col items-center">
+            <img id="lightbox-img" src="" class="max-w-full max-h-[75vh] object-contain shadow-2xl rounded">
+            <p id="lightbox-caption" class="text-white mt-4 text-lg font-bold"></p>
+            <div id="lightbox-counter" class="text-white/60 text-sm mt-2"></div>
+        </div>
+    </div>
+
+
+
+    <script>
+        const state = {
+            lessons: [], students: [], examsPre: [], examsPost: [], scores: [],
+            currentUser: null, isAdmin: false,
+            formLinks: [], formFiles: [], examFormImage: null, currentExamType: null, studentAnswers: {},
+            currentGallery: [], currentGalleryIndex: 0,
+            examOptionImages: [null, null, null, null]
+        };
+
+        const runGoogleScript = (func, ...args) => new Promise((resolve, reject) => google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[func](...args));
+
+        const app = {
+            init: () => {
+                app.switchAdminTab('lessons'); // Reset tab state
+                app.showView('home-view');
+                dataManager.loadLessons();
+            },
+            showView: (id) => {
+                document.querySelectorAll('.view-section').forEach(e => e.classList.add('hidden'));
+                const v = document.getElementById(id);
+                if (v) v.classList.remove('hidden');
+            },
+            showLoading: (s) => document.getElementById('loading-overlay').classList.toggle('hidden', !s),
+
+            // Admin
+            handleLogin: async (e) => {
+                e.preventDefault();
+                app.showLoading(true);
+                try {
+                    const r = await runGoogleScript('checkAdmin', document.getElementById('username').value, document.getElementById('password').value);
+                    if (r.success) {
+                        state.isAdmin = true; state.currentUser = { username: 'admin', role: 'admin' };
+                        closeModal('login-modal'); app.showView('admin-view'); app.switchAdminTab('lessons');
+                    } else Swal.fire('Error', 'Invalid Login', 'error');
+                } catch (err) { console.error(err); }
+                app.showLoading(false);
+            },
+            logout: () => { state.isAdmin = false; state.currentUser = null; app.showView('home-view'); Swal.fire('Logout', 'Success', 'success'); },
+            updateAdminProfile: async () => {
+                const oldU = document.getElementById('admin-current-username').value;
+                const newU = document.getElementById('admin-edit-username').value;
+                const newP = document.getElementById('admin-edit-password').value;
+                if (!newU || !newP) return Swal.fire('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                app.showLoading(true);
+                const r = await runGoogleScript('updateAdminProfile', oldU, newU, newP);
+                if (r.success) {
+                    Swal.fire('สำเร็จ', r.message, 'success');
+                    document.getElementById('admin-current-username').value = newU;
+                } else Swal.fire('Error', r.message, 'error');
+                app.showLoading(false);
+            },
+            switchAdminTab: (tab) => {
+                document.querySelectorAll('.admin-tab-content').forEach(e => e.classList.add('hidden'));
+                document.getElementById('tab-' + tab).classList.remove('hidden');
+                document.querySelectorAll('.admin-tab-btn').forEach(b => {
+                    if (b.dataset.tab === tab) b.classList.add('text-theme-main', 'border-theme-main', 'bg-white');
+                    else b.classList.remove('text-theme-main', 'border-theme-main', 'bg-white');
+                });
+                if (tab === 'students') dataManager.loadStudents();
+                if (tab === 'exams_pre') dataManager.loadExams('pre');
+                if (tab === 'exams_post') dataManager.loadExams('post');
+                if (tab === 'scores') dataManager.loadScores();
+                if (tab === 'profile') {
+                    app.showLoading(true);
+                    runGoogleScript('getAdminProfile').then(r => {
+                        if (r.success) {
+                            document.getElementById('admin-current-username').value = r.username;
+                            document.getElementById('admin-edit-username').value = r.username;
+                            document.getElementById('admin-edit-password').value = r.password;
+                        }
+                        app.showLoading(false);
+                    });
+                }
+                if (tab === 'lessons') dataManager.loadLessons();
+            },
+
+            // Student
+            openStudentLogin: (type) => {
+                const header = document.getElementById('student-modal-header');
+                const btn = document.getElementById('student-login-btn');
+                document.getElementById('exam-type-target').value = type;
+                document.getElementById('student-modal-title').innerText = type === 'pre' ? 'เข้าสู่ระบบ (ก่อนเรียน)' : 'เข้าสู่ระบบ (หลังเรียน)';
+
+                if (type === 'pre') {
+                    header.className = 'p-4 text-white flex justify-between items-center gradient-pre';
+                    btn.className = 'w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 font-bold shadow-lg transition-all active:scale-95';
+                } else {
+                    header.className = 'p-4 text-white flex justify-between items-center gradient-post';
+                    btn.className = 'w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-bold shadow-lg transition-all active:scale-95';
+                }
+
+                openModal('student-login-modal');
+            },
+            handleStudentLogin: async (e) => {
+                e.preventDefault();
+                const type = document.getElementById('exam-type-target').value;
+                app.showLoading(true);
+                const res = await runGoogleScript('loginStudent', document.getElementById('student-username').value, document.getElementById('student-password').value);
+                if (res.success) {
+                    state.currentUser = { username: document.getElementById('student-username').value, fullname: res.fullname, role: 'student' };
+                    state.currentExamType = type;
+                    closeModal('student-login-modal');
+                    await dataManager.loadExams(type);
+                    app.startExam(type);
+                } else Swal.fire('Failed', res.message, 'error');
+                app.showLoading(false);
+            },
+            startExam: (type) => {
+                const list = type === 'pre' ? state.examsPre : state.examsPost;
+                if (!list.length) return Swal.fire('Info', 'No exams found', 'info');
+                document.getElementById('exam-view-title').innerText = type === 'pre' ? 'แบบทดสอบก่อนเรียน' : 'แบบทดสอบหลังเรียน';
+                document.getElementById('exam-student-name').innerText = state.currentUser.fullname;
+                const c = document.getElementById('exam-questions-container');
+                c.innerHTML = ''; state.studentAnswers = {};
+                list.forEach((ex, i) => {
+                    c.innerHTML += `
+                    <div class="bg-white p-4 rounded shadow-sm border mb-4 text-sm sm:text-base">
+                        <div class="font-bold mb-3">${i + 1}. ${ex.question}</div>
+                        ${ex.image_url ? `<img src="${ex.image_url}" class="max-h-48 mb-4 rounded border mx-auto block object-contain shadow-sm">` : ''}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            ${ex.options.map((o, io) => {
+                        const optText = typeof o === 'object' ? o.text : o;
+                        const optImg = typeof o === 'object' ? o.image_url : '';
+                        return `
+                                <label class="flex flex-col border rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition-colors border-gray-200">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <input type="radio" name="q-${ex.id}" value="${io + 1}" onchange="state.studentAnswers['${ex.id}']=${io + 1}" class="w-4 h-4 text-theme-main">
+                                        <span class="font-medium">${optText}</span>
+                                    </div>
+                                    ${optImg ? `<img src="${optImg}" class="h-32 w-full object-contain rounded bg-gray-50 p-1">` : ''}
+                                </label>
+                                `;
+                    }).join('')}
+                        </div>
+                    </div>
+                   `;
+                });
+                app.showView('exam-view');
+            },
+            submitExam: async () => {
+                const list = state.currentExamType === 'pre' ? state.examsPre : state.examsPost;
+                if (Object.keys(state.studentAnswers).length < list.length) {
+                    if (!await Swal.fire({ title: 'Incomplete', text: 'ทำไม่ครบ ส่งเลยไหม?', showCancelButton: true }).then(r => r.isConfirmed)) return;
+                } else {
+                    if (!await Swal.fire({ title: 'Submit?', showCancelButton: true }).then(r => r.isConfirmed)) return;
+                }
+                app.showLoading(true);
+                const r = await runGoogleScript('submitExam', state.currentUser.username, state.currentExamType, state.studentAnswers);
+                app.showLoading(false);
+                if (r.success) {
+                    Swal.fire({ title: 'Score', html: `<div class="text-6xl text-green-500 font-bold">${r.score} / ${r.total}</div>`, icon: 'success' })
+                        .then(() => { state.currentUser = null; app.showView('home-view'); });
+                } else Swal.fire('Error', 'Submit failed', 'error');
+            },
+            filterScores: () => dataManager.loadScores(document.getElementById('score-filter').value),
+            openLightbox: (index) => {
+                state.currentGalleryIndex = index;
+                const img = state.currentGallery[index];
+                if (!img) return;
+                const lightbox = document.getElementById('lightbox-modal');
+                document.getElementById('lightbox-img').src = img.url;
+                document.getElementById('lightbox-caption').innerText = img.name || '';
+                document.getElementById('lightbox-counter').innerText = `${index + 1} / ${state.currentGallery.length}`;
+                lightbox.classList.remove('hidden');
+                document.body.classList.add('modal-active');
+            },
+            changeLightboxImage: (step) => {
+                let next = state.currentGalleryIndex + step;
+                if (next < 0) next = state.currentGallery.length - 1;
+                if (next >= state.currentGallery.length) next = 0;
+                app.openLightbox(next);
+            },
+            closeLightbox: () => {
+                document.getElementById('lightbox-modal').classList.add('hidden');
+                if (!document.getElementById('detail-modal').classList.contains('hidden')) {
+                    document.body.classList.add('modal-active');
+                } else {
+                    document.body.classList.remove('modal-active');
+                }
+            }
+        };
+
+        const dataManager = {
+            // Lessons
+            loadLessons: async () => {
+                app.showLoading(true);
+                const l = await runGoogleScript('fetchLessonList');
+                state.lessons = l.reverse();
+                dataManager.renderLessons();
+                app.showLoading(false);
+            },
+            renderLessons: () => {
+                const badge = document.getElementById('lesson-count-badge');
+                if (badge) badge.innerText = `${state.lessons.length} บทเรียน`;
+                // List
+                const list = document.getElementById('lesson-list');
+                const gradients = ['gradient-1', 'gradient-2', 'gradient-3', 'gradient-4', 'gradient-5', 'gradient-6'];
+                if (list) list.innerHTML = state.lessons.map((l, i) => {
+                    const gradClass = gradients[i % gradients.length];
+                    return `
+                    <div class="${gradClass} lesson-card-pattern card-pattern rounded-lg shadow-lg p-5 flex justify-between items-center cursor-pointer hover:-translate-y-1 transition-all" onclick="dataManager.viewLesson('${l.id}')">
+                         <div class="relative z-10">
+                            <div class="font-bold text-xl text-white drop-shadow-sm">${l.topic}</div>
+                            <div class="text-xs text-white/80 font-medium mt-1">${l.date_created}</div>
+                         </div>
+                         <i class="fa-solid fa-chevron-right text-white/50 relative z-10 text-xl"></i>
+                    </div>
+                `;
+                }).join('');
+                // Admin Table
+                const tbl = document.getElementById('admin-lesson-table-body');
+                if (tbl) tbl.innerHTML = state.lessons.map(l => `
+                    <tr class="hover:bg-gray-50 border-b">
+                        <td class="p-3">${l.date_created}</td>
+                        <td class="p-3 truncate max-w-xs">${l.topic}</td>
+                        <td class="p-3 text-center space-x-1">
+                            <button onclick="dataManager.prepareEdit('${l.id}')" class="text-yellow-600 hover:bg-yellow-100 p-1 rounded"><i class="fa-solid fa-edit"></i></button>
+                            <button onclick="dataManager.deleteLesson('${l.id}')" class="text-red-500 hover:bg-red-100 p-1 rounded"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            },
+            viewLesson: (id) => {
+                const l = state.lessons.find(x => x.id === id);
+                if (!l) return;
+                document.getElementById('detail-topic').innerText = l.topic;
+                document.getElementById('detail-date').innerText = l.date_created;
+                document.getElementById('detail-content').innerHTML = l.content;
+                // Links
+                const lnk = document.getElementById('detail-links-section');
+                if (l.links && l.links.length) {
+                    lnk.classList.remove('hidden');
+                    document.getElementById('detail-links-list').innerHTML = l.links.map(k => `<li><a href="${k.url}" target="_blank" class="text-blue-600 hover:underline"><i class="fa-solid fa-link mr-1"></i> ${k.name}</a></li>`).join('');
+                } else lnk.classList.add('hidden');
+                // Files
+                const gal = document.getElementById('detail-gallery-section');
+                const fls = document.getElementById('detail-files-section');
+                const imgs = (l.files || []).filter(f => f.type && f.type.startsWith('image'));
+                const docs = (l.files || []).filter(f => !f.type || !f.type.startsWith('image'));
+
+                if (imgs.length) {
+                    gal.classList.remove('hidden');
+                    state.currentGallery = imgs;
+                    document.getElementById('detail-gallery-grid').innerHTML = imgs.map((i, idx) => `<img src="${i.url}" class="h-32 w-full object-cover rounded cursor-pointer hover:scale-105 transition-transform shadow-sm" onclick="app.openLightbox(${idx})">`).join('');
+                } else gal.classList.add('hidden');
+
+                if (docs.length) {
+                    fls.classList.remove('hidden');
+                    document.getElementById('detail-files-list').innerHTML = docs.map(d => `<li class="flex justify-between bg-gray-50 p-2 rounded text-sm"><span>${d.name}</span><a href="${d.url}" target="_blank" class="text-teal-600 font-bold">Load</a></li>`).join('');
+                } else fls.classList.add('hidden');
+
+                openModal('detail-modal');
+            },
+            prepareAdd: () => {
+                document.getElementById('lesson-id').value = ''; document.getElementById('lesson-form').reset();
+                if (CKEDITOR.instances['lesson-content-editor']) CKEDITOR.instances['lesson-content-editor'].setData('');
+                state.formLinks = []; state.formFiles = []; dataManager.renderFormLinks(); dataManager.renderFormFiles();
+                openModal('lesson-modal');
+            },
+            prepareEdit: (id) => {
+                const l = state.lessons.find(x => x.id === id);
+                if (!l) return;
+                document.getElementById('lesson-id').value = l.id; document.getElementById('lesson-topic').value = l.topic;
+                if (CKEDITOR.instances['lesson-content-editor']) CKEDITOR.instances['lesson-content-editor'].setData(l.content);
+                state.formLinks = JSON.parse(JSON.stringify(l.links || [])); state.formFiles = JSON.parse(JSON.stringify(l.files || []));
+                dataManager.renderFormLinks(); dataManager.renderFormFiles();
+                openModal('lesson-modal');
+            },
+            addLinkToForm: () => { state.formLinks.push({ name: '', url: '' }); dataManager.renderFormLinks(); },
+            renderFormLinks: () => {
+                document.getElementById('links-container').innerHTML = state.formLinks.map((l, i) => `
+                    <div class="flex gap-2 mb-2"><input value="${l.name}" onchange="state.formLinks[${i}].name=this.value" class="border p-1 w-1/3" placeholder="Name"><input value="${l.url}" onchange="state.formLinks[${i}].url=this.value" class="border p-1 flex-1" placeholder="URL"><button type="button" onclick="state.formLinks.splice(${i},1); dataManager.renderFormLinks()" class="text-red-500">x</button></div>
+                `).join('');
+            },
+            handleFileSelect: (e) => {
+                const files = e.target ? e.target.files : e;
+                Array.from(files).forEach(f => {
+                    const r = new FileReader();
+                    r.onload = ev => { state.formFiles.push({ name: f.name, type: f.type, dataBase64: ev.target.result.split(',')[1], isNew: true }); dataManager.renderFormFiles(); }
+                    r.readAsDataURL(f);
+                });
+            },
+            renderFormFiles: () => {
+                document.getElementById('file-preview-list').innerHTML = state.formFiles.map((f, i) => `
+                    <li class="flex justify-between bg-gray-50 p-1 border rounded"><span>${f.name}</span><button type="button" onclick="state.formFiles.splice(${i},1); dataManager.renderFormFiles()" class="text-red-500 text-xs">x</button></li>
+                `).join('');
+            },
+            saveLesson: async (e) => {
+                e.preventDefault(); app.showLoading(true);
+                const fs = await Promise.all(state.formFiles.map(async f => {
+                    if (f.isNew) { const u = await runGoogleScript('uploadFile', f.dataBase64, f.name, f.type); return u.success ? { name: u.name, url: u.url, type: u.type } : null; }
+                    return { name: f.name, url: f.url, type: f.type };
+                }));
+                const p = { id: document.getElementById('lesson-id').value, topic: document.getElementById('lesson-topic').value, content: CKEDITOR.instances['lesson-content-editor'].getData(), links: state.formLinks, files: fs.filter(x => x) };
+                if (p.id) await runGoogleScript('updateLesson', p); else await runGoogleScript('saveLesson', p);
+                closeModal('lesson-modal'); await dataManager.loadLessons(); app.showLoading(false);
+            },
+            deleteLesson: async (id) => {
+                if (confirm('Delete?')) { app.showLoading(true); await runGoogleScript('deleteLesson', id); await dataManager.loadLessons(); app.showLoading(false); }
+            },
+
+            // Students
+            loadStudents: async () => {
+                app.showLoading(true);
+                state.students = await runGoogleScript('getStudents');
+                document.getElementById('student-table-body').innerHTML = state.students.map(s => `<tr><td class="p-3">${s.username}</td><td class="p-3">${s.fullname}</td><td class="p-3">${s.password}</td><td class="p-3 text-center"><button onclick="dataManager.deleteStudent('${s.username}')" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
+                app.showLoading(false);
+            },
+            saveStudent: async (e) => {
+                e.preventDefault(); app.showLoading(true);
+                await runGoogleScript('saveStudent', { username: document.getElementById('manage-student-username').value, password: document.getElementById('manage-student-password').value, fullname: document.getElementById('manage-student-fullname').value });
+                closeModal('student-modal'); dataManager.loadStudents(); app.showLoading(false);
+            },
+            deleteStudent: async (u) => { if (confirm('Delete?')) { await runGoogleScript('deleteStudent', u); dataManager.loadStudents(); } },
+
+            // Exams
+            loadExams: async (t) => {
+                app.showLoading(true);
+                const l = await runGoogleScript('getExams', t);
+                if (t === 'pre') state.examsPre = l; else state.examsPost = l;
+                if (state.isAdmin) {
+                    document.getElementById(t === 'pre' ? 'exam-pre-list' : 'exam-post-list').innerHTML = l.map(x => `
+                        <div class="bg-gray-50 border p-3 rounded mb-2 flex justify-between">
+                            <div><span class="font-bold">${x.question}</span><br><span class="text-xs text-gray-500">Ans: ${x.correct_answer}</span></div>
+                            <div><button onclick="dataManager.prepareEditExam('${t}','${x.id}')" class="text-blue-500 mr-2"><i class="fa-solid fa-edit"></i></button><button onclick="dataManager.deleteExam('${t}','${x.id}')" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div>
+                        </div>`).join('');
+                }
+                app.showLoading(false);
+            },
+            prepareAddExam: (t) => {
+                document.getElementById('exam-id').value = ''; document.getElementById('exam-type').value = t; document.getElementById('exam-question').value = '';
+                [1, 2, 3, 4].forEach(i => {
+                    document.getElementById('exam-opt-' + i).value = '';
+                    dataManager.clearOptionImage(i);
+                });
+                document.querySelectorAll('input[name="correct-ans"]').forEach(c => c.checked = false);
+                dataManager.clearExamImage(); openModal('exam-modal');
+            },
+            handleExamImage: (i) => {
+                if (i.files[0]) { const r = new FileReader(); r.onload = e => { state.examFormImage = { name: i.files[0].name, type: i.files[0].type, dataBase64: e.target.result.split(',')[1], isNew: true }; document.getElementById('exam-img-preview').classList.remove('hidden'); document.getElementById('exam-img-preview').style.backgroundImage = `url(${e.target.result})` }; r.readAsDataURL(i.files[0]); }
+            },
+            clearExamImage: () => { state.examFormImage = null; document.getElementById('exam-img-preview').classList.add('hidden'); document.getElementById('exam-file').value = ''; },
+            showExamImage: (url) => { if (url) { state.examFormImage = { url: url, isNew: false }; document.getElementById('exam-img-preview').classList.remove('hidden'); document.getElementById('exam-img-preview').style.backgroundImage = `url(${url})`; } },
+            showOptionImage: (url, idx) => { if (url) { state.examOptionImages[idx - 1] = { url: url, isNew: false }; const p = document.getElementById(`exam-opt-img-preview-${idx}`); p.classList.remove('hidden'); p.style.backgroundImage = `url(${url})`; } },
+            saveExam: async (e) => {
+                e.preventDefault(); app.showLoading(true);
+                // Main Image
+                let u = '';
+                if (state.examFormImage) {
+                    if (state.examFormImage.isNew) {
+                        const r = await runGoogleScript('uploadFile', state.examFormImage.dataBase64, state.examFormImage.name, state.examFormImage.type);
+                        if (r.success) u = r.url;
+                    } else u = state.examFormImage.url;
+                }
+
+                // Option Images
+                const finalOptions = await Promise.all([1, 2, 3, 4].map(async i => {
+                    const text = document.getElementById('exam-opt-' + i).value;
+                    let imgUrl = '';
+                    const optImg = state.examOptionImages[i - 1];
+                    if (optImg) {
+                        if (optImg.isNew) {
+                            const r = await runGoogleScript('uploadFile', optImg.dataBase64, optImg.name, optImg.type);
+                            if (r.success) imgUrl = r.url;
+                        } else imgUrl = optImg.url;
+                    }
+                    return { text, image_url: imgUrl };
+                }));
+
+                const d = {
+                    id: document.getElementById('exam-id').value,
+                    question: document.getElementById('exam-question').value,
+                    options: finalOptions,
+                    correct_answer: document.querySelector('input[name="correct-ans"]:checked').value,
+                    image_url: u
+                };
+                const t = document.getElementById('exam-type').value;
+                if (d.id) await runGoogleScript('updateExam', t, d); else await runGoogleScript('saveExam', t, d);
+                closeModal('exam-modal'); dataManager.loadExams(t); app.showLoading(false);
+            },
+            handleOptionImage: (i, idx) => {
+                if (i.files[0]) {
+                    const r = new FileReader();
+                    r.onload = e => {
+                        state.examOptionImages[idx - 1] = { name: i.files[0].name, type: i.files[0].type, dataBase64: e.target.result.split(',')[1], isNew: true };
+                        const prev = document.getElementById(`exam-opt-img-preview-${idx}`);
+                        prev.classList.remove('hidden');
+                        prev.style.backgroundImage = `url(${e.target.result})`;
+                    };
+                    r.readAsDataURL(i.files[0]);
+                }
+            },
+            clearOptionImage: (idx) => {
+                state.examOptionImages[idx - 1] = null;
+                document.getElementById(`exam-opt-img-preview-${idx}`).classList.add('hidden');
+                document.getElementById(`exam-opt-file-${idx}`).value = '';
+            },
+            prepareEditExam: (t, id) => {
+                const x = (t === 'pre' ? state.examsPre : state.examsPost).find(e => e.id === id);
+                if (!x) return;
+                document.getElementById('exam-id').value = x.id; document.getElementById('exam-type').value = t; document.getElementById('exam-question').value = x.question;
+
+                [1, 2, 3, 4].forEach(i => {
+                    const opt = x.options[i - 1];
+                    document.getElementById('exam-opt-' + i).value = typeof opt === 'object' ? opt.text : opt;
+                    dataManager.clearOptionImage(i);
+                    if (typeof opt === 'object' && opt.image_url) dataManager.showOptionImage(opt.image_url, i);
+                });
+
+                document.querySelector(`input[name="correct-ans"][value="${x.correct_answer}"]`).checked = true;
+                dataManager.clearExamImage();
+                if (x.image_url) dataManager.showExamImage(x.image_url);
+                openModal('exam-modal');
+            },
+            deleteExam: async (t, id) => { if (confirm('Delete?')) { await runGoogleScript('deleteExam', t, id); dataManager.loadExams(t); } },
+
+            // Scores
+            loadScores: async (type = 'pre') => {
+                app.showLoading(true);
+                try {
+                    const s = await runGoogleScript('getExamResults', type);
+                    state.scores = s || [];
+                    document.getElementById('score-filter').value = type;
+                    dataManager.renderScores(state.scores);
+                } catch (err) {
+                    console.error(err);
+                    Swal.fire('Error', 'ไม่สามารถดึงข้อมูลคะแนนได้', 'error');
+                }
+                app.showLoading(false);
+            },
+            renderScores: (s) => {
+                const list = s || [];
+                const body = document.getElementById('score-table-body');
+                if (list.length === 0) {
+                    body.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-400 italic">ไม่มีข้อมูลคะแนน</td></tr>';
+                    return;
+                }
+                body.innerHTML = list.map(r => `<tr><td class="p-3 text-center font-bold">#${r.rank}</td><td class="p-3">${r.fullname}</td><td class="p-3 text-center font-bold text-green-600">${r.score}</td><td class="p-3 text-center text-sm">${r.timestamp}</td></tr>`).join('');
+            }
+        };
+
+        // Helpers
+        window.openModal = (id) => { const m = document.getElementById(id); if (m) { m.classList.remove('hidden'); document.body.classList.add('modal-active'); } };
+        window.closeModal = (id) => { const m = document.getElementById(id); if (m) { m.classList.add('hidden'); document.body.classList.remove('modal-active'); } };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            app.init();
+            CKEDITOR.replace('lesson-content-editor', { versionCheck: false, height: 250, removeButtons: 'Save,NewPage,Print,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField' });
+
+
+
+            // Drag and Drop
+            const dz = document.getElementById('drop-zone');
+            const fi = document.getElementById('file-input');
+            if (dz && fi) {
+                dz.onclick = () => fi.click();
+                dz.onsubmit = e => e.preventDefault();
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+                    dz.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); });
+                });
+                ['dragenter', 'dragover'].forEach(evt => {
+                    dz.addEventListener(evt, () => dz.classList.add('dragover'));
+                });
+                ['dragleave', 'drop'].forEach(evt => {
+                    dz.addEventListener(evt, () => dz.classList.remove('dragover'));
+                });
+                dz.addEventListener('drop', e => {
+                    dataManager.handleFileSelect(e.dataTransfer.files);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
